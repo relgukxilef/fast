@@ -22,7 +22,7 @@ struct atomic_unique_ptr {
     ) noexcept;
     bool compare_exchange_weak(T*& expected, T* desired);
 
-    std::atomic<T*> const& const_data() const noexcept;
+    const std::atomic<T*>* const_data() const noexcept;
 
 private:
     std::atomic<T*> pointer;
@@ -63,9 +63,9 @@ bool atomic_unique_ptr<T>::compare_exchange_weak(T*& expected, T* desired) {
 }
 
 template<class T>
-typename std::atomic<T*> const&
+typename std::atomic<T*> const*
 atomic_unique_ptr<T>::const_data() const noexcept {
-    return pointer;
+    return &pointer;
 }
 
 }

@@ -41,4 +41,17 @@ TEST_SUITE("atomic_unique_ptr") {
 
         CHECK(count == 0);
     }
+
+    TEST_CASE("const_data should point to internal pointer") {
+        fast::atomic_unique_ptr<test> pointer;
+        std::atomic<test*> const* const_data = pointer.const_data();
+
+        test* t = new test();
+        pointer.store(t);
+        CHECK(const_data->load() == t);
+
+        t = new test();
+        pointer.store(t);
+        CHECK(const_data->load() == t);
+    }
 }
