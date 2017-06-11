@@ -3,12 +3,16 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES +=
+SOURCES += \
+    source/events/event.cpp \
+    source/events/event_loop.cpp
 
 HEADERS += \
     source/atomic/atomic_push_queue.h \
     source/atomic/atomic_unique_ptr.h \
-    source/threading/inter_thread_queue.h
+    source/threading/inter_thread_queue.h \
+    source/events/event.h \
+    source/events/event_loop.h
 
 test {
     SOURCES += test/main.cpp
