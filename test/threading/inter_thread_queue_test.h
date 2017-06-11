@@ -46,4 +46,32 @@ TEST_SUITE("inter_thread_queue") {
 
         CHECK(queue.pop() == false);
     }
+
+    TEST_CASE("pop should retreive elements from producer") {
+        fast::inter_thread_queue<int> queue;
+
+        fast::inter_thread_queue<int>::producer producer(&queue);
+
+        CHECK(producer.push(1) == false);
+        CHECK(producer.push(2) == true);
+
+        CHECK(queue.top() == 1);
+        queue.pop() == true;
+        CHECK(queue.top() == 2);
+        queue.pop();
+    }
+
+    TEST_CASE("consumer should retreive elements after push") {
+        fast::inter_thread_queue<int> queue;
+
+        fast::inter_thread_queue<int>::consumer consumer(&queue);
+
+        queue.push(1);
+        queue.push(2);
+
+        CHECK(consumer.top() == 1);
+        CHECK(consumer.pop() == true);
+        CHECK(consumer.top() == 2);
+        CHECK(consumer.pop() == false);
+    }
 }

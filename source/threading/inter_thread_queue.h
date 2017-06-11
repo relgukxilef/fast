@@ -8,12 +8,56 @@
 
 namespace fast {
 
+/**
+ * @brief The inter_thread_queue struct is a dynamically growing queue.
+ * It provides a way of communication between two threads.
+ * Call to push and pop operations synchronize with each other but
+ * multiple calls to push or pop are not thread safe.
+ */
 template<class Item>
 struct inter_thread_queue {
-    /* Thread-safe, dynamically growing queue.
-     * When an element has to be inserted when the
-     * available space is not sufficient alocate more
+    /**
+     * @brief The producer struct represents the end of the queue where
+     * elements are inserted. This struct is not thread safe.
      */
+    struct producer {
+        producer(inter_thread_queue* queue);
+
+        /**
+         * @brief push an element to the queue
+         * @param value The value to push
+         * @return true if the queue was not empty, false if it was
+         */
+        bool push(Item&& value);
+        bool push(Item const& value);
+
+    private:
+        inter_thread_queue* queue;
+    };
+
+    /**
+     * @brief The consumer struct represents the end of the queue where
+     * elements are read from. This struct is not thread safe.
+     */
+    struct consumer {
+        consumer(inter_thread_queue* queue);
+
+        /**
+         * @brief pop an element off the queue
+         * @return true if the queue has more elements
+         */
+        bool pop();
+
+        /**
+         * @brief get the next element in the queue
+         * @return the top of the queue
+         */
+        Item& top();
+
+    private:
+        inter_thread_queue* queue;
+
+    };
 
     inter_thread_queue(int capacity = 4);
     ~inter_thread_queue();
@@ -34,9 +78,17 @@ struct inter_thread_queue {
      */
     bool pop();
 
-    Item &top();
+    /**
+     * @brief get the next element in the queue
+     * @return the top of the queue
+     */
+    Item& top();
 
-    int available();
+    /**
+     * @brief get_available number of elements
+     * @return the number of available elements
+     */
+    int get_available();
 
 private:
     /* TODO: instead of size store the number of items
@@ -78,10 +130,36 @@ private:
 };
 
 template<class Item>
-inter_thread_queue<Item>::block::block(
-    unsigned int size, inter_thread_queue<Item>::block *next
-) :
-    size(size), items(new Item[size]), next(next ? next : this) {}
+inter_thread_queue<Item>::producer::producer(inter_thread_queue<Item>* queue) :
+    queue(queue)
+{
+}
+
+template<class Item>
+bool inter_thread_queue<Item>::producer::push(Item const& value) {
+    return queue->push(value);
+}
+
+template<class Item>
+bool inter_thread_queue<Item>::producer::push(Item&& value) {
+    return queue->push(value);
+}
+
+template<class Item>
+inter_thread_queue<Item>::consumer::consumer(inter_thread_queue<Item>* queue) :
+    queue(queue)
+{
+}
+
+template<class Item>
+bool inter_thread_queue<Item>::consumer::pop() {
+    return queue->pop();
+}
+
+template<class Item>
+Item& inter_thread_queue<Item>::consumer::top() {
+    return queue->top();
+}
 
 template<class Item>
 inter_thread_queue<Item>::inter_thread_queue(int capacity) :
@@ -155,9 +233,20 @@ bool inter_thread_queue<Item>::pop() {
 }
 
 template<class Item>
-Item &inter_thread_queue<Item>::top() {
+Item& inter_thread_queue<Item>::top() {
     return tail->items.get()[read];
 }
+
+template<class Item>
+int inter_thread_queue<Item>::get_available() {
+    return size.load(std::memory_order_acquire);
+}
+
+template<class Item>
+inter_thread_queue<Item>::block::block(
+    unsigned int size, inter_thread_queue<Item>::block* next
+) :
+    size(size), items(new Item[size]), next(next ? next : this) {}
 
 }
 
