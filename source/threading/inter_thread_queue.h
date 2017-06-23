@@ -59,7 +59,7 @@ struct inter_thread_queue {
 
     };
 
-    inter_thread_queue(int capacity = 4);
+    inter_thread_queue(unsigned int capacity = 4);
     ~inter_thread_queue();
 
     inter_thread_queue(const inter_thread_queue &) = delete;
@@ -68,6 +68,8 @@ struct inter_thread_queue {
      * @brief push an element to the queue
      * @param value The value to push
      * @return true if the queue was not empty, false if it was
+     * If the consumer sleeps if the queue is empty the return value
+     * represents whether the consumer was awake.
      */
     bool push(Item&& value);
     bool push(Item const& value);
@@ -142,7 +144,7 @@ bool inter_thread_queue<Item>::producer::push(Item const& value) {
 
 template<class Item>
 bool inter_thread_queue<Item>::producer::push(Item&& value) {
-    return queue->push(value);
+    return queue->push(std::move(value));
 }
 
 template<class Item>
@@ -162,7 +164,7 @@ Item& inter_thread_queue<Item>::consumer::top() {
 }
 
 template<class Item>
-inter_thread_queue<Item>::inter_thread_queue(int capacity) :
+inter_thread_queue<Item>::inter_thread_queue(unsigned int capacity) :
     size(0),
     block_size(1),
     capacity(capacity),
@@ -211,7 +213,7 @@ bool inter_thread_queue<Item>::push(Item &&value) {
 
 template<class Item>
 bool inter_thread_queue<Item>::push(Item const& value) {
-    int copy = value;
+    auto copy = value;
     return push(std::move(copy));
 }
 

@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <cassert>
+#include <utility>
 
 #include "atomic_unique_ptr.h"
 
@@ -47,7 +48,7 @@ atomic_push_queue<Item>::~atomic_push_queue() {
 
 template<class Item>
 void atomic_push_queue<Item>::push(Item&& item) {
-    node* new_node = new node {{nullptr}, item};
+    node* new_node = new node {{nullptr}, std::move(item)};
 
     bool index = this->index.load();
     int count = readers[index].fetch_add(1);
@@ -75,7 +76,7 @@ bool atomic_push_queue<Item>::pop(Item& item) {
     node* n = next->load();
     if (n != nullptr) {
         next = &n->next;
-        item = n->value;
+        item = std::move(n->value);
         result = true;
 
     } else {
@@ -95,7 +96,7 @@ bool atomic_push_queue<Item>::pop(Item& item) {
             n = next->load();
             if (n != nullptr) {
                 next = &n->next;
-                item = n->value;
+                item = std::move(n->value);
                 result = true;
             }
         }
