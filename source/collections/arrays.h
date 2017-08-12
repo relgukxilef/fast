@@ -51,16 +51,16 @@ private:
     iterator end_iterator;
 };
 
-namespace {
+namespace detail {
     // functors
     struct incrementer {
         template<class Type>
-        Type operator()(Type& i);
+        Type& operator()(Type& i);
     };
 
     struct decrementer {
         template<class Type>
-        Type operator()(Type& i);
+        Type& operator()(Type& i);
     };
 
     struct adder {
@@ -70,16 +70,6 @@ namespace {
 
         template<class Type>
         Type operator()(const Type& i);
-    };
-
-    template<class Value_type>
-    struct value_initializer {
-        Value_type value;
-
-        value_initializer(Value_type&& value);
-
-        template<class Type>
-        Type operator()(const Type&);
     };
 
     struct unique_span_beginner {
@@ -92,15 +82,6 @@ namespace {
         Type* operator()(const unique_span<Type>& s);
     };
 
-    struct unique_span_initializer {
-        std::size_t size;
-
-        unique_span_initializer(std::size_t size);
-
-        template<class Type>
-        unique_span<Type> operator()(const unique_span<Type>&);
-    };
-
     struct pointer_referencer {
         template<class Type>
         Type&& operator()(Type* p);
@@ -110,7 +91,7 @@ namespace {
 
 template<class... Types>
 arrays<Types...>::iterator::iterator() : data(
-    map(std::tuple<Types*...>(), value_initializer<std::nullptr_t>(nullptr))
+    std::make_tuple(static_cast<Types*>(nullptr)...)
 ) {}
 
 template<class... Types>
@@ -119,29 +100,29 @@ arrays<Types...>::iterator::iterator(const std::tuple<Types*...>& data) :
 
 template<class... Types>
 std::tuple<Types&&...> arrays<Types...>::iterator::operator*() {
-    return map(data, pointer_referencer());
+    return map(data, detail::pointer_referencer());
 }
 
 template<class... Types>
 void arrays<Types...>::iterator::operator++() {
-    map(data, incrementer());
+    map(data, detail::incrementer());
 }
 
 template<class... Types>
 void arrays<Types...>::iterator::operator--() {
-    map(data, decrementer());
+    map(data, detail::decrementer());
 }
 
 template<class... Types>
 typename arrays<Types...>::iterator
 arrays<Types...>::iterator::operator+(std::ptrdiff_t value) {
-    return iterator(map(data, adder(value)));
+    return iterator(map(data, detail::adder(value)));
 }
 
 template<class... Types>
 typename arrays<Types...>::iterator
 arrays<Types...>::iterator::operator-(std::ptrdiff_t value) {
-    return iterator(map(data, adder(-value)));
+    return iterator(map(data, detail::adder(-value)));
 }
 
 template<class... Types>
@@ -188,7 +169,7 @@ size_t arrays<Types...>::capacity() const {
 
 template<class... Types>
 typename arrays<Types...>::iterator arrays<Types...>::begin() const {
-    return iterator(map(data, unique_span_beginner()));
+    return iterator(map(data, detail::unique_span_beginner()));
 }
 
 template<class... Types>
@@ -203,14 +184,14 @@ arrays<Types...>::insert(std::tuple<Types&&...> value) {
         // resize
         std::tuple<unique_span<Types>...> new_data;
         if (capacity() == 0) {
-            new_data = map(data, unique_span_initializer(4));
+            new_data = std::make_tuple(unique_span<Types>(4)...);
         } else {
-            new_data = map(data, unique_span_initializer(capacity() * 2));
+            new_data = std::make_tuple(unique_span<Types>(capacity() * 2)...);
         }
 
         end_iterator = std::move(
             begin(), end(),
-            iterator(map(new_data, unique_span_beginner()))
+            iterator(map(new_data, detail::unique_span_beginner()))
         );
 
         data = std::move(new_data);
@@ -231,53 +212,37 @@ arrays<Types...>::erase(arrays<Types...>::iterator i) {
 }
 
 template<class Type>
-Type incrementer::operator()(Type& i) {
-    return ++i;
+Type& detail::incrementer::operator()(Type& i) {
+    i++;
+    return i;
 }
 
 template<class Type>
-Type decrementer::operator()(Type& i) {
-    return --i;
+Type& detail::decrementer::operator()(Type& i) {
+    i--;
+    return i;
 }
 
-adder::adder(std::ptrdiff_t diff) : diff(diff) {}
+detail::adder::adder(std::ptrdiff_t diff) : diff(diff) {}
 
 template<class Type>
-Type adder::operator()(const Type& i) {
+Type detail::adder::operator()(const Type& i) {
     return i + diff;
 }
 
-template<class Value_type>
-value_initializer<Value_type>::value_initializer(Value_type&& value) :
-    value(std::move(value)) {}
-
-template<class Value_type> template<class Type>
-Type value_initializer<Value_type>::operator()(const Type&) {
-    return value;
-}
-
 template<class Type>
-Type* unique_span_beginner::operator()(const unique_span<Type>& s) {
+Type* detail::unique_span_beginner::operator()(const unique_span<Type>& s) {
     return s.begin();
 }
 
 template<class Type>
-Type* unique_span_ender::operator()(const unique_span<Type>& s) {
+Type* detail::unique_span_ender::operator()(const unique_span<Type>& s) {
     return s.end();
 }
 
-unique_span_initializer::unique_span_initializer(std::size_t size) :
-    size(size) {}
-
 template<class Type>
-unique_span<Type> unique_span_initializer::operator()(
-    const unique_span<Type>&
-) {
-    return std::move(unique_span<Type>(size));
-}
+Type&& detail::pointer_referencer::operator()(Type* p) {
 
-template<class Type>
-Type&& pointer_referencer::operator()(Type* p) {
     return std::move(*p);
 }
 
