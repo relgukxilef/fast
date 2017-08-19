@@ -13,7 +13,8 @@ HEADERS += \
     source/threading/inter_thread_queue.h \
     source/collections/span.h \
     source/collections/arrays.h \
-    source/collections/tuple.h
+    source/collections/tuple.h \
+    source/utility/observable.h
 
 test {
     SOURCES += test/main.cpp
@@ -22,7 +23,8 @@ test {
         test/atomic/atomic_unique_ptr_test.h \
         test/threading/inter_thread_queue_test.h \
         test/collections/span_test.h \
-        test/collections/arrays_test.h
+        test/collections/arrays_test.h \
+        test/utility/observable_test.h
 
     QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
     QMAKE_LFLAGS += -lgcov --coverage
