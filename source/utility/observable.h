@@ -7,17 +7,18 @@ namespace fast {
 
 namespace detail {
     struct ring {
+        ring& operator= (ring& other);
+        ring& operator= (ring&& other);
+
+        ring* next, * previous;
+
+    protected:
         ring();
         ring(const ring& other) = delete;
         ring(ring& other);
         ring(ring&& other);
 
         ~ring();
-
-        ring& operator= (ring& other);
-        ring& operator= (ring&& other);
-
-        ring* next, * previous;
     };
 }
 
