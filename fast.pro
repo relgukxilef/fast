@@ -14,7 +14,8 @@ HEADERS += \
     source/collections/span.h \
     source/collections/arrays.h \
     source/collections/tuple.h \
-    source/utility/observable.h
+    source/utility/observable.h \
+    source/utility/unique_link.h
 
 test {
     SOURCES += test/main.cpp
@@ -24,7 +25,8 @@ test {
         test/threading/inter_thread_queue_test.h \
         test/collections/span_test.h \
         test/collections/arrays_test.h \
-        test/utility/observable_test.h
+        test/utility/observable_test.h \
+        test/utility/unique_link_test.h
 
     QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage
     QMAKE_LFLAGS += -lgcov --coverage

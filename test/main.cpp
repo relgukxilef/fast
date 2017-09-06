@@ -7,3 +7,4 @@
 #include "collections/span_test.h"
 #include "collections/arrays_test.h"
 #include "utility/observable_test.h"
+#include "utility/unique_link_test.h"
