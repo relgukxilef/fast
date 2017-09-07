@@ -182,6 +182,7 @@ typename arrays<Types...>::iterator
 arrays<Types...>::insert(std::tuple<Types&&...> value) {
     if (size() == capacity()) {
         // resize
+        // TODO: allocate storage without initializing elements
         std::tuple<unique_span<Types>...> new_data;
         if (capacity() == 0) {
             new_data = std::make_tuple(unique_span<Types>(4)...);
