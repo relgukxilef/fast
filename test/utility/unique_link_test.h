@@ -1,7 +1,7 @@
 #include <doctest.h>
 #include <vector>
 
-#include "source/utility/unique_link.h"
+#include "source/fast/utility/unique_link.h"
 
 TEST_SUITE("unique_link") {
     TEST_CASE("destruction of unique_link unlinks other") {

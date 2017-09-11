@@ -1,6 +1,6 @@
 #include <doctest.h>
 
-#include "source/atomic/atomic_push_queue.h"
+#include "source/fast/atomic/atomic_push_queue.h"
 
 TEST_SUITE("atomic_push_queue") {
     TEST_CASE("pop empty queue should not return false") {

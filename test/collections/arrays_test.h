@@ -1,6 +1,6 @@
 #include <doctest.h>
 
-#include "source/collections/arrays.h"
+#include "source/fast/collections/arrays.h"
 
 TEST_SUITE("arrays") {
     TEST_CASE("insert should store element") {

@@ -1,6 +1,6 @@
 #include <doctest.h>
 
-#include "source/utility/observable.h"
+#include "source/fast/utility/observable.h"
 
 TEST_SUITE("observable") {
     TEST_CASE("observable should store value") {
@@ -62,7 +62,7 @@ TEST_SUITE("observable") {
         fast::observable<int> value;
 
         {
-            fast::observer<int> observer([] (const int& new_value) {});
+            fast::observer<int> observer([] (const int&) {});
 
             observer = value;
         }

@@ -1,6 +1,6 @@
 #include <doctest.h>
 
-#include "source/atomic/atomic_unique_ptr.h"
+#include "source/fast/atomic/atomic_unique_ptr.h"
 
 TEST_SUITE("atomic_unique_ptr") {
     static int count = 0;

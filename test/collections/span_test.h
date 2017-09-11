@@ -1,7 +1,7 @@
 #include <doctest.h>
 #include <vector>
 
-#include "source/collections/span.h"
+#include "source/fast/collections/span.h"
 
 TEST_SUITE("span") {
     TEST_CASE("span allows iteration over a vector") {

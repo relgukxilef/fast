@@ -1,6 +1,6 @@
 #include <doctest.h>
 
-#include "source/threading/inter_thread_queue.h"
+#include "source/fast/threading/inter_thread_queue.h"
 
 TEST_SUITE("inter_thread_queue") {
     TEST_CASE("pop should retreive elements in correct order") {
