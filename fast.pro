@@ -11,6 +11,7 @@ HEADERS += \
     source/fast/atomic/atomic_push_queue.h \
     source/fast/atomic/atomic_unique_ptr.h \
     source/fast/threading/inter_thread_queue.h \
+    source/fast/threading/semaphore.h \
     source/fast/collections/span.h \
     source/fast/collections/arrays.h \
     source/fast/collections/tuple.h \
@@ -26,6 +27,7 @@ test {
         test/threading/inter_thread_queue_test.h \
         test/collections/span_test.h \
         test/collections/arrays_test.h \
+        test/threading/semaphore_test.h \
         test/utility/observable_test.h \
         test/utility/unique_link_test.h \
         test/collections/unordered_vector_test.h

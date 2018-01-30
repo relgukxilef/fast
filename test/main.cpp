@@ -9,3 +9,4 @@
 #include "collections/unordered_vector_test.h"
 #include "utility/observable_test.h"
 #include "utility/unique_link_test.h"
+#include "threading/semaphore_test.h"
