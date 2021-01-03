@@ -1,0 +1,10 @@
+install:
+  - set PATH=%PATH%;C:\Qt\5.15\mingw81_64\bin;C:\Qt\Tools\mingw810_32\bin
+  - appveyor DownloadFile https://raw.githubusercontent.com/onqtam/doctest/master/doctest/doctest.h
+build_script:
+  - qmake fast.pro -spec win32-g++ CONFIG+=test 
+  - mingw32-make
+test_script:
+  - .\release\fast.exe -r=junit -o=result.xml
+  - ps: $wc = New-Object 'System.Net.WebClient'
+  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\result.xml))
