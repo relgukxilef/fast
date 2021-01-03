@@ -5,3 +5,5 @@
 
 !*.pro
 !*.pri
+
+!appveyor.yml
